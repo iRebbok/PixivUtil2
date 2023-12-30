@@ -38,9 +38,11 @@ class PixivListItem(object):
                                  errorCode=PixivException.FILE_NOT_EXISTS_OR_NO_WRITE_PERMISSION)
 
         reader = PixivHelper.open_text_file(filename)
-        line_no = 1
+        line_no = -1
         try:
             for line in reader:
+                line_no = line_no + 1
+
                 original_line = line
                 # PixivHelper.safePrint("Processing: " + line)
                 if line.startswith('#') or len(line) < 1:
@@ -128,7 +130,6 @@ class PixivListItem(object):
                 list_item = PixivListItem(member_or_content_id, path, is_content_id)
                 # PixivHelper.safePrint(u"- {0} ==> {1} ".format(member_id, path))
                 members.append(list_item)
-                line_no = line_no + 1
                 original_line = ""
         except UnicodeDecodeError:
             PixivHelper.get_logger().exception("PixivListItem.parseList(): Invalid value when parsing list")
