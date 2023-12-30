@@ -173,6 +173,7 @@ def menu():
     print(' 16. Download by Rank')
     print(' 17. Download by Rank R-18')
     print(' 18. Download by New Illusts')
+    print(' 19. Download from list of urls')
     print(Style.BRIGHT + '── FANBOX '.ljust(PADDING, "─") + Style.RESET_ALL)
     print(' f1. Download from supporting list (FANBOX)')
     print(' f2. Download by artist/creator id (FANBOX)')
@@ -473,8 +474,9 @@ def menu_download_by_tag_and_member_id(opisvalid, args, options):
                                   member_id=int(member_id))
 
 
-def menu_download_from_list(opisvalid, args, options):
-    __log__.info('Batch mode from list (4).')
+def menu_download_from_list(opisvalid, args, options, download_by_urls=False):
+    # Is download_by_urls parameter's the only purpose to indicate mode number?
+    __log__.info(format('Batch mode from list ({}).', '19' if download_by_urls else '4'))
     global op
     global __config__
     include_sketch = False
@@ -1217,7 +1219,7 @@ def set_console_title(title=''):
 def setup_option_parser():
 
     global __valid_options
-    __valid_options = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18',
+    __valid_options = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
                        'f1', 'f2', 'f3', 'f4', 'f5',
                        's1', 's2',
                        'l', 'd', 'e', 'm', 'b', 'p', 'c')
@@ -1440,6 +1442,8 @@ def main_loop(ewd, op_is_valid, selection, np_is_valid_local, args, options):
                 menu_download_by_rank_r18(op_is_valid, args, options)
             elif selection == '18':
                 menu_download_new_illusts(op_is_valid, args, options)
+            elif selection == '19':
+                menu_download_from_list(op_is_valid, args, options, download_by_urls=True)
             elif selection == "l":
                 menu_export_database_images(op_is_valid, args, options)
             elif selection == 'b':

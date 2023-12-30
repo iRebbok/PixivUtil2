@@ -11,17 +11,22 @@ from PixivException import PixivException
 
 class PixivListItem(object):
     '''Class for item in list.txt'''
-    memberId = ""
+    # Represents either contentId or memberId
+    dataId = ""
+    # Distinct contentId from memberId by boolen
+    # False means it's memberId, True is contentId, respectively
+    memberOrContent: bool = False
     path = ""
 
-    def __init__(self, memberId, path):
-        self.memberId = int(memberId)
+    def __init__(self, dataId, path, isContentId):
+        self.dataId = int(dataId)
         self.path = path.strip()
+        self.memberOrContent = isContentId
         if self.path == r"N\A":
             self.path = ""
 
     def __repr__(self):
-        return "(id:{0}, path:'{1}')".format(self.memberId, self.path)
+        return "(id:{0}, path:'{1}')".format(self.dataId, self.path)
 
     @staticmethod
     def parseList(filename, rootDir=None):
@@ -46,6 +51,10 @@ class PixivListItem(object):
                 line = line.strip()
                 items = line.split(None, 1)
 
+                # Indicates whether or not it's a contentId instead of memberId,
+                # see PixivListItem.memberOrContent member comment
+                is_content_id = False
+
                 if items[0].startswith("http"):
                     # handle urls:
                     # http://www.pixiv.net/member_illust.php?id=<member_id>
@@ -54,19 +63,44 @@ class PixivListItem(object):
                     if parsed.path == "/member.php" or parsed.path == "/member_illust.php":
                         query_str = parse.parse_qs(parsed.query)
                         if 'id' in query_str:
-                            member_id = int(query_str["id"][0])
+                            member_or_content_id = int(query_str["id"][0])
                         else:
                             PixivHelper.print_and_log(
                                 'error', "Cannot detect member id from url: " + items[0])
                             continue
+                    # Handle artwork urls:
+                    # https://www.pixiv.net/<en/?>artworks/<content id>
+                    # The en in angle brackets indicates language
+                    # but seems to missing in non-english site versions
+                    # (Japanese, Korean, whatewer I don't understand
+                    # kanji/hiragana/katakana aka runes - yes I googled the name)
+                    elif (strippedArtworksUrl := parsed.path.replace("/en", "", 1)).startswith("/artworks/"):
+                        is_content_id = True
+                        # Some fail tolerance
+                        try:
+                            member_or_content_id = int(
+                                strippedArtworksUrl.replace("/artworks/", "", 1).rstrip("/")
+                            )
+                        except Exception as contentIdException:
+                            PixivHelper.print_and_log(
+                                "warning",
+                                format(
+                                    "Unable to extract ContentId from URL on {} line: {}",
+                                    line_no,
+                                    items[0],
+                                ),
+                                contentIdException,
+                            )
+                            continue
                     else:
                         PixivHelper.print_and_log(
-                            'error', "Unsupported url detected: " + items[0])
+                            "error", "Unsupported url detected: " + items[0]
+                        )
                         continue
 
                 else:
                     # handle member id directly
-                    member_id = int(items[0])
+                    member_or_content_id = int(items[0])
 
                 path = ""
                 if len(items) > 1:
@@ -91,7 +125,7 @@ class PixivListItem(object):
                     path = path.replace('\\\\', '\\')
                     path = path.replace('\\', os.sep)
 
-                list_item = PixivListItem(member_id, path)
+                list_item = PixivListItem(member_or_content_id, path, is_content_id)
                 # PixivHelper.safePrint(u"- {0} ==> {1} ".format(member_id, path))
                 members.append(list_item)
                 line_no = line_no + 1
