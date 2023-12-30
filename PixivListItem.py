@@ -3,6 +3,7 @@
 
 import os
 import re
+from typing import Self
 from urllib import parse
 
 import PixivHelper
@@ -29,9 +30,9 @@ class PixivListItem(object):
         return "(id:{0}, path:'{1}')".format(self.dataId, self.path)
 
     @staticmethod
-    def parseList(filename, rootDir=None):
+    def parseList(filename, rootDir=None) -> list[Self]:
         '''read list.txt and return the list of PixivListItem'''
-        members = list()
+        members = list[PixivListItem]
 
         if not os.path.exists(filename):
             raise PixivException("File doesn't exists or no permission to read: " + filename,

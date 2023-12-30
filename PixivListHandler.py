@@ -5,6 +5,8 @@ import PixivArtistHandler
 import PixivHelper
 import PixivSketchHandler
 import PixivTagsHandler
+import PixivImageHandler
+
 from PixivListItem import PixivListItem
 from PixivTags import PixivTags
 
@@ -44,12 +46,20 @@ def process_list(caller, config, list_file_name=None, tags=None, include_sketch=
             while True:
                 try:
                     prefix = f"[{current_member} of {len(result)}] "
-                    PixivArtistHandler.process_member(caller,
-                                                      config,
-                                                      item.memberId,
-                                                      user_dir=item.path,
-                                                      tags=tags,
-                                                      title_prefix=prefix)
+                    if item.memberOrContent:
+                        PixivImageHandler.process_image(caller,
+                                                        config,
+                                                        artist=None,
+                                                        image_id=item.dataId,
+                                                        user_dir=item.path,
+                                                        title_prefix=prefix)
+                    else:
+                        PixivArtistHandler.process_member(caller,
+                                                        config,
+                                                        item.dataId,
+                                                        user_dir=item.path,
+                                                        tags=tags,
+                                                        title_prefix=prefix)
                     break
                 except KeyboardInterrupt:
                     raise
