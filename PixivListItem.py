@@ -19,7 +19,7 @@ class PixivListItem(object):
     memberOrContent: bool = False
     path = ""
 
-    def __init__(self, dataId, path, isContentId):
+    def __init__(self, dataId, path, isContentId=False):
         self.dataId = int(dataId)
         self.path = path.strip()
         self.memberOrContent = isContentId
