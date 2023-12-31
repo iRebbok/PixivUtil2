@@ -35,7 +35,7 @@ def process_list(caller, config, list_file_name=None, tags=None, include_sketch=
             ignore_list = PixivListItem.parseList(ignore_file_list, config.rootDirectory)
             for ignore in ignore_list:
                 for item in result:
-                    if item.memberId == ignore.memberId:
+                    if item.dataId == ignore.dataId:
                         result.remove(item)
                         break
 
@@ -95,7 +95,7 @@ def process_list(caller, config, list_file_name=None, tags=None, include_sketch=
 
             current_member = current_member + 1
             br.clear_history()
-            print(f'done for member id = {item.memberId}.')
+            print(f'done for id = {item.dataId}.')
             print('')
     except Exception as ex:
         if isinstance(ex, KeyboardInterrupt):

@@ -32,7 +32,7 @@ class PixivListItem(object):
     @staticmethod
     def parseList(filename, rootDir=None) -> list[Self]:
         '''read list.txt and return the list of PixivListItem'''
-        members = list[PixivListItem]
+        members: list[PixivListItem] = []
 
         if not os.path.exists(filename):
             raise PixivException("File doesn't exists or no permission to read: " + filename,
